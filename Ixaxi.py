@@ -1,16 +1,18 @@
 #from numpy import True_
 import pyxel
-import DEF
-import ClassSprite
-import FuncTitle
-from enum import Enum
+import Common
+import Sprite
+import Title
+import GamePlay
 
-GState= DEF.GS_TITLE    #Game State
+TitleObj = Title.clsTitle()
+GamePlayObj = GamePlay.clsGamePlay()
 
 class App:
+    #GState=DEF.GS_TITLE    #Game State
 
     def __init__(self):
-        
+        #DEF.GState = DEF.GS_TITLE
         #player
         # self.px=60
         # self.py=HEIGHT-16
@@ -36,21 +38,22 @@ class App:
         # #floor
         # self.initFlr()
 
-        pyxel.init(DEF.WIDTH, DEF.HEIGHT, "I.X.A.X.I. for Pyxel", DEF.FPS)
+        pyxel.init(Common.WIDTH, Common.HEIGHT, "I.X.A.X.I. for Pyxel", Common.FPS)
         pyxel.load("./assets/ixaxi.pyxres")
         pyxel.run(self.update, self.draw)
 
     def update(self):
 
-        match GState:
-            case DEF.GS_PLAY:
+        match Common.GState:
+            case Common.GS_PLAY:
+                GamePlayObj.update()
                 pass
-            case DEF.GS_TITLE:
-                FuncTitle.update()
+            case Common.GS_TITLE:
+                TitleObj.update()
                 pass
-            case DEF.GS_GAMEOVER:
+            case Common.GS_GAMEOVER:
                 pass
-            case DEF.GS_DEMO:
+            case Common.GS_DEMO:
                 pass
 
         # if pyxel.btnp(pyxel.KEY_Q):
@@ -97,18 +100,19 @@ class App:
                 
     def draw(self):
 
-        match GState:
-            case DEF.GS_PLAY:
+        match Common.GState:
+            case Common.GS_PLAY:
+                GamePlayObj.draw()
                 pass
-            case DEF.GS_TITLE:
-                FuncTitle.draw()
+            case Common.GS_TITLE:
+                TitleObj.draw()
 
                 #print("Draw Title")
                 #objTitle.draw()
                 pass
-            case DEF.GS_GAMEOVER:
+            case Common.GS_GAMEOVER:
                 pass
-            case DEF.GS_DEMO:
+            case Common.GS_DEMO:
                 pass
 
 App()
