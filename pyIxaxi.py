@@ -87,7 +87,7 @@ class App:
         # if self.plsp.sphitr(self.ensp)==True:
         #     print("Hit")
 
-        # #床との接触判定
+        # #床との接触判定 
         # for i in range(len(FloorList)):
         #     if self.plsp.sphitr(FloorList[i])==True:
         #         #FloorList[i].show_collision_r(True)
