@@ -3,7 +3,8 @@ import pyxel
 import Common
 import math
 
-BulletList = []
+ShipPosRecMax = 100
+
 
 def cleanup_list(list):
     i = 0
@@ -14,7 +15,12 @@ def cleanup_list(list):
         else:
             i += 1
 
+#SinCosテーブル
+SinTbl = []
+CosTbl = []
 
+#弾管理クラス
+BulletList = []
 class BULLET:
     def __init__(self, x, y, spd):
         self.bx = x
@@ -33,6 +39,13 @@ class BULLET:
         if self.enable == True:
             pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
 
+#座標管理
+class SHIPPOS:
+    def __init__(self, x, y):
+        self.x=x
+        self.y=y
+
+#自機管理クラス
 class SHIP:
     def __init__(self):
         self.px=100
@@ -40,16 +53,17 @@ class SHIP:
         self.vx=0
         self.vy=0
 
-        self.sintbl = []
-        self.costbl = []
-
-        for i in range(0,359):
-            r = math.radians(i)
-            self.sintbl.append(math.sin(r))
-            self.costbl.append(math.cos(r))
 
     def draw(self):
         pyxel.blt(self.px, self.py, 0, 0,0, 16,16, 15)
+
+# class OPTION:
+#     def __init__(self):
+#         self.ex=0
+#         self.ey=0
+
+
+
 
 class clsGamePlay:
 
@@ -57,6 +71,24 @@ class clsGamePlay:
         self.ship = SHIP()
         self.FpsCount=0
         self.BltTimer=0
+
+        #自機の移動軌跡を保存
+        self.PosList = []
+        for i in range(0,ShipPosRecMax+1):
+            self.PosList.append(SHIPPOS(0,0))
+
+        self.PosIndx=0  #自機のロータリーバッファポインタ
+        self.OptPosIndx = -10   #オプションの座標は10インデックス遅れでついてくる
+
+        #hoge
+        #self.poslist[0].x = 10
+        #self.poslist[5].y = 11
+
+
+        for i in range(0,359):
+            r = math.radians(i)
+            SinTbl.append(math.sin(r))
+            CosTbl.append(math.cos(r))
 
     def update(self):
         vx=0
@@ -88,6 +120,21 @@ class clsGamePlay:
         self.ship.px+=(vx * cx)
         self.ship.py+=(vy * cy)
 
+        #自機の過去座標をロータリーバッファに保存
+        self.PosList[self.PosIndx].x = self.ship.px
+        self.PosList[self.PosIndx].y = self.ship.py
+        self.PosIndx+=1
+        if ShipPosRecMax < self.PosIndx:
+            self.PosIndx = 0
+
+        #オプションのロータリーバッファ参照座標
+        self.OptPosIndx+=1
+        if ShipPosRecMax < self.OptPosIndx:
+            self.OptPosIndx = 0
+
+        #print(self.PosIndx)
+
+
         if pyxel.btn(pyxel.KEY_SPACE):
             if self.BltTimer <= 0:
                 BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
@@ -110,9 +157,17 @@ class clsGamePlay:
         pyxel.cls(1)
         self.ship.draw()
 
+        #オプション表示
+        #self.PosList[self.PosIndx].x = self.ship.px
+        #self.PosList[self.PosIndx].y = self.ship.px
+
+        if 0 < self.OptPosIndx:
+            pyxel.blt(self.PosList[self.OptPosIndx].x - 32, self.PosList[self.OptPosIndx].y+16, 0, 0,0, 16,16, 15)
+
+
         #print(len(BulletList))
-        for i in range(0, len(BulletList)):
-            BulletList[i].draw()
+        #for i in range(0, len(BulletList)):
+        #    BulletList[i].draw()
     
 
 

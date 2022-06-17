@@ -5,6 +5,8 @@ import Sprite
 import Title
 import GamePlay
 
+VER='0.0.1'
+
 TitleObj = Title.clsTitle()
 GamePlayObj = GamePlay.clsGamePlay()
 

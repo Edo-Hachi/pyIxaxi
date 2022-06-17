@@ -16,7 +16,7 @@ class clsTitle:
 
     def draw(self):
         pyxel.cls(1)
-        pyxel.text(100,100,"TITLE", 7)
+        pyxel.text(100,100,"I.X.A.X.I.", 7)
         pyxel.text(100,120,"Press [Q] QuitGame.", 7)
 
-        pyxel.blt(120,100, 0, 0,0, 16,16, 15)
+        pyxel.blt(0,50, 2, 0,0, 191,32, 15)
