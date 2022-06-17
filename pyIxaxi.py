@@ -106,6 +106,12 @@ class App:
                 pass
             case Common.GS_TITLE:
                 TitleObj.draw()
+                
+                #if pyxel.btnp(pyxel.GAMEPAD1_AXIS_LEFTX):
+                #    print("Pad Analog Left")
+                #y= pyxel.btnp(pyxel.GAMEPAD1_AXIS_LEFTY)
+                #print(x, y)
+
 
                 #print("Draw Title")
                 #objTitle.draw()
