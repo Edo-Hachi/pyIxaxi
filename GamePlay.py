@@ -28,17 +28,34 @@ class clsGamePlay:
         self.ship = SHIP()
 
     def update(self):
-        if pyxel.btnp(pyxel.KEY_UP):
-            self.ship.vy=-1
-        elif pyxel.btnp(pyxel.KEY_DOWN):
-            self.ship.vy=1
-        elif pyxel.btnp(pyxel.KEY_LEFT):
-            self.ship.vx=-1
-        elif pyxel.btnp(pyxel.KEY_RIGHT):
-            self.ship.vx=1
+        vx=0
+        vy=0
+        if pyxel.btn(pyxel.KEY_UP):
+            vy=-1
+        if pyxel.btn(pyxel.KEY_DOWN):
+            vy=1
+        if pyxel.btn(pyxel.KEY_LEFT):
+            vx=-1
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            vx=1
+
+        if pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
+            vy=-1
+        if pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
+            vy=1
+        if pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
+            vx=-1
+        if pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
+            vx=1
         
-        self.ship.px+=self.ship.vx
-        self.ship.py+=self.ship.vy
+        cx=1
+        cy=1
+        if vx != 0 and vy != 0:
+            cx = 0.71
+            cy = 0.71
+        
+        self.ship.px+=(vx * cx)
+        self.ship.py+=(vy * cy)
 
     def draw(self):
         pyxel.cls(1)
