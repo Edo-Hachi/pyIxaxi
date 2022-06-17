@@ -7,7 +7,7 @@ class clsTitle:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
         elif pyxel.btnp(pyxel.KEY_S):
-            print("Push S")
+            #print("Push S")
             Common.GState = Common.GS_PLAY
             #return DEF.GS_PLAY
             #Ixaxi.GState=DEF.GS_PLAY    #Game State

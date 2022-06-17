@@ -38,6 +38,8 @@ class BULLET:
     def draw(self):
         if self.enable == True:
             pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
+            print("shot draw")
+
 
 #座標管理
 class SHIPPOS:
@@ -75,15 +77,10 @@ class clsGamePlay:
         #自機の移動軌跡を保存
         self.PosList = []
         for i in range(0,ShipPosRecMax+1):
-            self.PosList.append(SHIPPOS(0,0))
+            self.PosList.append(SHIPPOS(-1,-1))
 
         self.PosIndx=0  #自機のロータリーバッファポインタ
         self.OptPosIndx = -10   #オプションの座標は10インデックス遅れでついてくる
-
-        #hoge
-        #self.poslist[0].x = 10
-        #self.poslist[5].y = 11
-
 
         for i in range(0,359):
             r = math.radians(i)
@@ -124,15 +121,13 @@ class clsGamePlay:
         self.PosList[self.PosIndx].x = self.ship.px
         self.PosList[self.PosIndx].y = self.ship.py
         self.PosIndx+=1
-        if ShipPosRecMax < self.PosIndx:
+        if ShipPosRecMax-1 < self.PosIndx:
             self.PosIndx = 0
 
         #オプションのロータリーバッファ参照座標
         self.OptPosIndx+=1
-        if ShipPosRecMax < self.OptPosIndx:
-            self.OptPosIndx = 0
-
-        #print(self.PosIndx)
+        if ShipPosRecMax-1 < self.OptPosIndx:
+            self.OptPosIndx = 1
 
 
         if pyxel.btn(pyxel.KEY_SPACE):
@@ -142,11 +137,10 @@ class clsGamePlay:
             else:
                 self.BltTimer -= 1
 
-
         for i in range(0, len(BulletList)):
             BulletList[i].update()
 
-        cleanup_list(BulletList)
+        #cleanup_list(BulletList)
 
     def draw(self):
         self.FpsCount+=1
@@ -158,16 +152,16 @@ class clsGamePlay:
         self.ship.draw()
 
         #オプション表示
-        #self.PosList[self.PosIndx].x = self.ship.px
-        #self.PosList[self.PosIndx].y = self.ship.px
 
         if 0 < self.OptPosIndx:
-            pyxel.blt(self.PosList[self.OptPosIndx].x - 32, self.PosList[self.OptPosIndx].y+16, 0, 0,0, 16,16, 15)
+#            if self.PosList[self.OptPosIndx].x != -1 and self.PosList[self.OptPosIndx].y != -1:
+            pyxel.blt(self.PosList[self.OptPosIndx].x - 24, self.PosList[self.OptPosIndx].y+8, 0, 32,0, 16,16, 15)
+            pyxel.blt(self.PosList[self.OptPosIndx].x + 24, self.PosList[self.OptPosIndx].y+8, 0, 32,0, 16,16, 15)
+            #self.PosList[self.OptPosIndx].x = self.PosList[self.OptPosIndx].y = -1
 
-
-        #print(len(BulletList))
-        #for i in range(0, len(BulletList)):
-        #    BulletList[i].draw()
+        
+        for i in range(0, len(BulletList)):
+            BulletList[i].draw()
     
 
 
