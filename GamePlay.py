@@ -178,7 +178,7 @@ class clsGamePlay:
             y2=y1 + SinTbl[self.OptAngleTbl[self.OptAngle]]*5
             pyxel.circ(x2,y2,1,8)
 
-            #print(self.OptAngle, CosTbl[self.OptAngle], SinTbl[self.OptAngle])
+            print(self.OptAngle, CosTbl[self.OptAngle], SinTbl[self.OptAngle])
 
         
         for i in range(0, len(BulletList)):
