@@ -3,9 +3,13 @@ import pyxel
 import Common
 import math
 
-ShipPosRecMax = 100
+ShipPosRecMax = 100 #自機の移動履歴レコード上限
 
+#SinCosテーブル
+SinTbl = []
+CosTbl = []
 
+#消去フラグの立ったリスト要素を削除する
 def cleanup_list(list):
     i = 0
     while i < len(list):
@@ -14,10 +18,6 @@ def cleanup_list(list):
             list.pop(i)
         else:
             i += 1
-
-#SinCosテーブル
-SinTbl = []
-CosTbl = []
 
 #弾管理クラス
 BulletList = []
@@ -55,27 +55,75 @@ class SHIP:
         self.vx=0
         self.vy=0
 
-
     def draw(self):
         pyxel.blt(self.px, self.py, 0, 0,0, 16,16, 15)
 
-# class OPTION:
-#     def __init__(self):
-#         self.ex=0
-#         self.ey=0
+#オプション管理
+class OPTION:
+    #オプションの角度テーブル
+    OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, (360-15), (360-30), (360-45), (360-60), (360-75), (360-90)]
 
+    OFSX=16
+    OFSY=8
+    def __init__(self, px, py): #px, py=Player Ship Pos
+        self.Angle = 6
+        self.px = px
+        self.py = py
+        self.Lock = 0
 
+        self.OptAngleTblSize = len(OPTION.OptAngleTbl)
+    
+    def SetPos(self, px, py):
+        self.px = px
+        self.py = py
 
+    def AngleLock(self, Lock:bool=False):
+        self.Lock = Lock
+
+    def AngleReset(self):
+        self.Angle = 6
+
+    def SetAngle(self, AddAngle): #AddAngle = +1 or -1
+        if self.Lock == True:
+            return
+
+        #--------------------------------------------------------------------
+        #print(self.OptAngleTblSize)
+
+        if 0 < self.Angle and AddAngle == -1: #AddAngleself.OptAngle and self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
+            self.Angle -=1
+        
+        if self.Angle < 12  and AddAngle == 1:
+            self.Angle +=1
+
+    #オプション表示
+    def draw(self):
+        pyxel.blt(self.px - OPTION.OFSX, self.py+OPTION.OFSY, 0, 32,0, 16,16, 15)
+        pyxel.blt(self.px + OPTION.OFSX, self.py+OPTION.OFSY, 0, 32,0, 16,16, 15)
+            
+        #オプション光点L
+        x1=self.px - OPTION.OFSX + 8
+        y1=self.py + OPTION.OFSY + 8
+
+        x2=x1 - CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
+        y2=y1 + SinTbl[OPTION.OptAngleTbl[self.Angle]]*5
+        pyxel.circ(x2,y2,1,8)
+        pyxel.line(x1,y1,x2,y2,8)
+
+        #オプション光点R
+        x1=self.px + OPTION.OFSX + 8
+        x2=x1 + CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
+        pyxel.circ(x2,y2,1,8)
+        pyxel.line(x1,y1,x2,y2,8)
 
 class clsGamePlay:
-
     def __init__(self):
         self.ship = SHIP()
         self.FpsCount=0
         self.BltTimer=0 #弾の発射間隔
+        self.OptionLock=False   #オプション角度ロックフラグ
 
-        self.OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, 360-15, 360-30, 360-45, 360-60, 360-75, 360-90]
-        self.OptAngle = 6
+        self.Option = OPTION(0, 0)  #オプション管理クラス
 
         #自機の移動軌跡を保存
         self.PosList = []
@@ -85,6 +133,7 @@ class clsGamePlay:
         self.PosIndx=0  #自機のロータリーバッファポインタ
         self.OptPosIndx = -15  #オプションの座標は15インデックス遅れでついてくる
 
+        #Sin Cos Table初期化
         for i in range(0,359):
             r = math.radians(i)
             SinTbl.append(math.sin(r))
@@ -98,22 +147,20 @@ class clsGamePlay:
         vy=0
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             vy=-1
-            if 0< self.OptAngle and self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
-                self.OptAngle -=1
+            if self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
+                self.Option.SetAngle(-1)
+                #if 0< self.OptAngle and self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
+                #    self.OptAngle -=1
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             vy=1
-            if self.OptAngle < 12  and self.FpsCount % 3 == 0:
-                self.OptAngle +=1
+            if self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
+                self.Option.SetAngle(1)
+            #if self.OptAngle < 12  and self.FpsCount % 3 == 0:
+            #    self.OptAngle +=1
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             vx=-1
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
             vx=1
-
-        #print(self.OptAngle, round(self.OptAngle))
-#---------------------------------------------------------------------------
-        #print(self.OptAngleTbl[self.OptAngle])
-#SinTbl = []
-#CosTbl = []
 
         cx=1
         cy=1
@@ -134,9 +181,18 @@ class clsGamePlay:
         self.OptPosIndx+=1
         if ShipPosRecMax-1 < self.OptPosIndx:
             self.OptPosIndx = 1
-        
+
+        #オプションの角度ロックを行うか？
+        if pyxel.btn(pyxel.KEY_X):
+            self.Option.AngleLock(True)
+        else:
+            self.Option.AngleLock(False)
+
+        #オプションに現在座標設定
+        self.Option.SetPos(self.PosList[self.OptPosIndx].x, self.PosList[self.OptPosIndx].y)
+
         #弾発射
-        if pyxel.btn(pyxel.KEY_SPACE):
+        if pyxel.btn(pyxel.KEY_Z):
             if self.BltTimer <= 0:
                 BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
                 self.BltTimer = 5   #Bullet Fire Timing
@@ -150,37 +206,17 @@ class clsGamePlay:
         self.FpsCount+=1
         if 59<self.FpsCount:
             self.FpsCount=0
-        #print(self.FpsCount)
 
         pyxel.cls(1)
+
+        #オプション描画
+        if 0 < self.OptPosIndx: #オプションの表示座標は-15フレームから始めているので
+            self.Option.draw()
+
+        #自機描画
         self.ship.draw()
 
-        #オプション表示
-        if 0 < self.OptPosIndx:
-#            if self.PosList[self.OptPosIndx].x != -1 and self.PosList[self.OptPosIndx].y != -1:
-            pyxel.blt(self.PosList[self.OptPosIndx].x - 24, self.PosList[self.OptPosIndx].y+8, 0, 32,0, 16,16, 15)
-            pyxel.blt(self.PosList[self.OptPosIndx].x + 24, self.PosList[self.OptPosIndx].y+8, 0, 32,0, 16,16, 15)
-            #self.PosList[self.OptPosIndx].x = self.PosList[self.OptPosIndx].y = -1
-            
-            #オプション光点L
-            x1=self.PosList[self.OptPosIndx].x - 24 + 8
-            y1=self.PosList[self.OptPosIndx].y + 8 + 8
-
-            x2=x1 - CosTbl[self.OptAngleTbl[self.OptAngle]]*5
-            y2=y1 + SinTbl[self.OptAngleTbl[self.OptAngle]]*5
-            pyxel.circ(x2,y2,1,8)
-
-            #オプション光点R
-            x1=self.PosList[self.OptPosIndx].x + 24 + 8
-            y1=self.PosList[self.OptPosIndx].y + 8 + 8
-
-            x2=x1 + CosTbl[self.OptAngleTbl[self.OptAngle]]*5   #x軸反転
-            y2=y1 + SinTbl[self.OptAngleTbl[self.OptAngle]]*5
-            pyxel.circ(x2,y2,1,8)
-
-            print(self.OptAngle, CosTbl[self.OptAngle], SinTbl[self.OptAngle])
-
-        
+        #自弾描画       
         for i in range(0, len(BulletList)):
             BulletList[i].draw()
     
