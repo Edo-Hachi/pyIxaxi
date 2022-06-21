@@ -98,7 +98,8 @@ class SHIP:
 #オプション管理
 class OPTION:
     #オプションの角度テーブル
-    OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, (360-15), (360-30), (360-45), (360-60), (360-75), (360-90)]
+    #OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, (360-15), (360-30), (360-45), (360-60), (360-75), (360-90)]
+    OptAngleTbl = [(360-90), (360-75), (360-60), (360-45), (360-30), (360-15), 0, 15, 30, 45, 60, 75, 90]
 
     OFSX=16
     OFSY=8
@@ -187,13 +188,13 @@ class clsGamePlay:
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             vy=-1
             if self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
-                self.Option.SetAngle(-1)
+                self.Option.SetAngle(1)
                 #if 0< self.OptAngle and self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
                 #    self.OptAngle -=1
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             vy=1
             if self.FpsCount % 3 == 0: #3フレーム毎に角度を変更
-                self.Option.SetAngle(1)
+                self.Option.SetAngle(-1)
             #if self.OptAngle < 12  and self.FpsCount % 3 == 0:
             #    self.OptAngle +=1
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
@@ -239,6 +240,8 @@ class clsGamePlay:
             if self.BltTimer <= 0:
                 #BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
                 BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4))
+
+                
                 self.BltTimer = 5   #Bullet Fire Timing
             else:
                 self.BltTimer -= 1
