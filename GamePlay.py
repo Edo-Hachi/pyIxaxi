@@ -1,4 +1,5 @@
 from math import radians
+from numpy import size
 import pyxel
 import Common
 import math
@@ -16,29 +17,65 @@ def cleanup_list(list):
         elem = list[i]
         if elem.enable == False:
             list.pop(i)
+            print("Delete bullet")
         else:
             i += 1
 
 #弾管理クラス
 BulletList = []
-class BULLET:
-    def __init__(self, x, y, spd):
-        self.bx = x
-        self.by = y
-        self.spd = spd
-        self.enable = True
+# class BULLET:
+#     def __init__(self, x, y, spd):
+#         self.bx = x
+#         self.by = y
+#         self.spd = spd
+#         self.enable = True
     
+#     def update(self):
+#         if self.enable == True:
+#             self.by -= self.spd
+
+#         if self.by < -16:
+#             self.enable = False
+
+#     def draw(self):
+#         if self.enable == True:
+#             pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
+#             #print("shot draw")
+
+class BULLET:
+    def __init__(self, sx, sy, deg, spd):
+        self.sx = sx    #開始座標
+        self.sy = sy
+
+        self.bx = sx    #現在座標
+        self.by = sy
+
+        self.spd = spd  #Speed
+        #self.rad = math.atan2(ty-sy, tx-sx)
+        self.deg= deg #math.degrees(self.rad)
+        self.vx = CosTbl[self.deg]
+        self.vy = SinTbl[self.deg]
+
+        self.enable = True
+
     def update(self):
         if self.enable == True:
-            self.by -= self.spd
+            #self.by -= self.spd
+            self.bx += self.vx * self.spd
+            self.by += self.vy * self.spd
 
+        if self.bx < -16:
+            self.enable = False
+        if Common.WIDTH+16 < self.bx:
+            self.enable = False
         if self.by < -16:
+            self.enable = False
+        if Common.HEIGHT+16<self.by:
             self.enable = False
 
     def draw(self):
         if self.enable == True:
             pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
-            #print("shot draw")
 
 
 #座標管理
@@ -108,13 +145,13 @@ class OPTION:
         x2=x1 - CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
         y2=y1 + SinTbl[OPTION.OptAngleTbl[self.Angle]]*5
         pyxel.circ(x2,y2,1,8)
-        pyxel.line(x1,y1,x2,y2,8)
+        #pyxel.line(x1,y1,x2,y2,8)
 
         #オプション光点R
         x1=self.px + OPTION.OFSX + 8
         x2=x1 + CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
         pyxel.circ(x2,y2,1,8)
-        pyxel.line(x1,y1,x2,y2,8)
+        #pyxel.line(x1,y1,x2,y2,8)
 
 class clsGamePlay:
     def __init__(self):
@@ -139,6 +176,8 @@ class clsGamePlay:
             SinTbl.append(math.sin(r))
             CosTbl.append(math.cos(r))
     
+        #print (CosTbl[270] ,SinTbl[270] )
+
     #更新処理
     def update(self):
         
@@ -192,15 +231,24 @@ class clsGamePlay:
         self.Option.SetPos(self.PosList[self.OptPosIndx].x, self.PosList[self.OptPosIndx].y)
 
         #弾発射
+
+#    class BULLET2:
+#    def __init__(self, sx, sy, deg, spd):
+
         if pyxel.btn(pyxel.KEY_Z):
             if self.BltTimer <= 0:
-                BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
+                #BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
+                BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4))
                 self.BltTimer = 5   #Bullet Fire Timing
             else:
                 self.BltTimer -= 1
 
         for i in range(0, len(BulletList)):
             BulletList[i].update()
+
+        #debug
+        cleanup_list(BulletList)
+
 
     def draw(self):
         self.FpsCount+=1
