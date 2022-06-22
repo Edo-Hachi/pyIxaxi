@@ -1,7 +1,9 @@
+# Phthon3 Program
+
 from xmlrpc.client import Boolean
 import pyxel
 
-class ClsSprite:
+class SPRITE:
     def __init__(self):
         self._x = -100      #スプライト表示座標
         self._y = -100

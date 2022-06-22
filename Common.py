@@ -1,3 +1,5 @@
+# Phthon3 Program
+
 WIDTH=256
 HEIGHT=256
 FPS=60

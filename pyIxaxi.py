@@ -1,3 +1,5 @@
+# Phthon3 Program
+
 #from numpy import True_
 import pyxel
 import Common
@@ -22,7 +24,7 @@ class App:
         # self.vx = 0
         # self.vy = 0
         # self.initVy = -10
-        # self.gravity = 1
+        # self.gravity = 1x
         # self.flgJmp=False
 
         # self.plsp = SpObj.sprite()

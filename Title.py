@@ -1,3 +1,4 @@
+# python3 Program
 #from curses.ascii import GS
 import pyxel
 import Common
