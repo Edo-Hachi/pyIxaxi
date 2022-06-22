@@ -2,6 +2,7 @@ from math import radians
 from numpy import size
 import pyxel
 import Common
+import Sprite
 import math
 
 ShipPosRecMax = 100 #自機の移動履歴レコード上限
@@ -23,24 +24,6 @@ def cleanup_list(list):
 
 #弾管理クラス
 BulletList = []
-# class BULLET:
-#     def __init__(self, x, y, spd):
-#         self.bx = x
-#         self.by = y
-#         self.spd = spd
-#         self.enable = True
-    
-#     def update(self):
-#         if self.enable == True:
-#             self.by -= self.spd
-
-#         if self.by < -16:
-#             self.enable = False
-
-#     def draw(self):
-#         if self.enable == True:
-#             pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
-#             #print("shot draw")
 
 class BULLET:
     def __init__(self, sx, sy, deg, spd):
@@ -99,21 +82,31 @@ class SHIP:
 class OPTION:
     #オプションの角度テーブル
     #OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, (360-15), (360-30), (360-45), (360-60), (360-75), (360-90)]
-    OptAngleTbl = [(360-90), (360-75), (360-60), (360-45), (360-30), (360-15), 0, 15, 30, 45, 60, 75, 90]
+    ROptAngleTbl = [(360-90), (360-75), (360-60), (360-45), (360-30), (360-15), 0, 15, 30, 45, 60, 75, 90]
+
+    LOptAngleTbl = [(270), (180+75), (180+60), (180+45), (180+30), (180+15), 0, (180-15), (180-30), (180-45), (180-60), (180-75), 90]
 
     OFSX=16
-    OFSY=8
+    OFSY=16
     def __init__(self, px, py): #px, py=Player Ship Pos
         self.Angle = 6
         self.px = px
         self.py = py
         self.Lock = 0
+        self.OptAngleTblSize = len(OPTION.ROptAngleTbl)
 
-        self.OptAngleTblSize = len(OPTION.OptAngleTbl)
+        self.Spl = Sprite.SPRITE()
+        self.Spl.spset(0, 16,16, 8, 8, 32,0, 15)
+        self.Spl.spshow(True)
+
     
     def SetPos(self, px, py):
         self.px = px
         self.py = py
+
+        self.lox = px - OPTION.OFSX #Left Option xpos
+        self.rox = px + OPTION.OFSX #right Option xpos
+        self.loy = self.roy = (py+OPTION.OFSY)
 
     def AngleLock(self, Lock:bool=False):
         self.Lock = Lock
@@ -136,22 +129,24 @@ class OPTION:
 
     #オプション表示
     def draw(self):
-        pyxel.blt(self.px - OPTION.OFSX, self.py+OPTION.OFSY, 0, 32,0, 16,16, 15)
-        pyxel.blt(self.px + OPTION.OFSX, self.py+OPTION.OFSY, 0, 32,0, 16,16, 15)
-            
+        #pyxel.blt(self.lox, self.loy, 0, 32,0, 16,16, 15)
+        #pyxel.blt(self.rox, self.roy, 0, 32,0, 16,16, 15)
+
+        self.Spl.spdraw(self.lox, self.loy)
+
         #オプション光点L
-        x1=self.px - OPTION.OFSX + 8
+        x1=self.lox
         y1=self.py + OPTION.OFSY + 8
 
-        x2=x1 - CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
-        y2=y1 + SinTbl[OPTION.OptAngleTbl[self.Angle]]*5
-        pyxel.circ(x2,y2,1,8)
-        #pyxel.line(x1,y1,x2,y2,8)
+        #x2=CosTbl[OPTION.LOptAngleTbl[self.Angle]]*5
+        #y2=SinTbl[OPTION.LOptAngleTbl[self.Angle]]*5
+        #pyxel.circ(x2,y2,1,8)
+        pyxel.line(self.lox, self.loy, 0,0,8)
 
         #オプション光点R
-        x1=self.px + OPTION.OFSX + 8
-        x2=x1 + CosTbl[OPTION.OptAngleTbl[self.Angle]]*5
-        pyxel.circ(x2,y2,1,8)
+        # x1=self.px + OPTION.OFSX + 8
+        # x2=x1 + CosTbl[OPTION.ROptAngleTbl[self.Angle]]*5
+        # pyxel.circ(x2,y2,1,8)
         #pyxel.line(x1,y1,x2,y2,8)
 
 class clsGamePlay:
@@ -241,7 +236,16 @@ class clsGamePlay:
                 #BulletList.append(BULLET(self.ship.px, self.ship.py, 4))
                 BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4))
 
-                
+                BulletList.append(BULLET(self.Option.rox, self.Option.roy, OPTION.ROptAngleTbl[self.Option.Angle],3))
+                BulletList.append(BULLET(self.Option.lox, self.Option.loy, OPTION.LOptAngleTbl[self.Option.Angle],3))
+
+    # OptAngleTbl = [(360-90), (360-75), (360-60), (360-45), (360-30), (360-15), 0, 15, 30, 45, 60, 75, 90]
+
+    # OFSX=16
+    # OFSY=8
+    # def __init__(self, px, py): #px, py=Player Ship Pos
+    #     self.Angle = 6
+
                 self.BltTimer = 5   #Bullet Fire Timing
             else:
                 self.BltTimer -= 1
