@@ -18,7 +18,7 @@ def cleanup_list(list):
         elem = list[i]
         if elem.enable == False:
             list.pop(i)
-            print("Delete bullet")
+            #print("Delete bullet")
         else:
             i += 1
 
@@ -39,6 +39,10 @@ class BULLET:
         self.vx = CosTbl[self.deg]
         self.vy = SinTbl[self.deg]
 
+        self.sp = Sprite.SPRITE()
+        self.sp.spset(0, 16,16, 8,8, 16,16,15)
+        self.sp.spshow(True)
+
         self.enable = True
 
     def update(self):
@@ -58,7 +62,9 @@ class BULLET:
 
     def draw(self):
         if self.enable == True:
-            pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
+            #pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
+            self.sp.spdraw(self.bx, self.by)
+            
 
 
 #座標管理
@@ -75,8 +81,13 @@ class SHIP:
         self.vx=0
         self.vy=0
 
+        self.SpPl = Sprite.SPRITE()
+        self.SpPl.spset(0, 16,16, 8, 8, 0,0, 15)
+        self.SpPl.spshow(True)
+
     def draw(self):
-        pyxel.blt(self.px, self.py, 0, 0,0, 16,16, 15)
+        #pyxel.blt(self.px, self.py, 0, 0,0, 16,16, 15)
+        self.SpPl.spdraw(self.px, self.py)
 
 #オプション管理
 class OPTION:
@@ -84,10 +95,10 @@ class OPTION:
     #OptAngleTbl = [90, 75, 60, 45, 30, 15, 0, (360-15), (360-30), (360-45), (360-60), (360-75), (360-90)]
     ROptAngleTbl = [(360-90), (360-75), (360-60), (360-45), (360-30), (360-15), 0, 15, 30, 45, 60, 75, 90]
 
-    LOptAngleTbl = [(270), (180+75), (180+60), (180+45), (180+30), (180+15), 0, (180-15), (180-30), (180-45), (180-60), (180-75), 90]
+    LOptAngleTbl = [(270), (180+75), (180+60), (180+45), (180+30), (180+15), 180, (180-15), (180-30), (180-45), (180-60), (180-75), 90]
 
     OFSX=16
-    OFSY=16
+    OFSY=8
     def __init__(self, px, py): #px, py=Player Ship Pos
         self.Angle = 6
         self.px = px
@@ -98,6 +109,10 @@ class OPTION:
         self.Spl = Sprite.SPRITE()
         self.Spl.spset(0, 16,16, 8, 8, 32,0, 15)
         self.Spl.spshow(True)
+
+        self.Spr = Sprite.SPRITE()
+        self.Spr.spset(0, 16,16, 8, 8, 32,0, 15)
+        self.Spr.spshow(True)
 
     
     def SetPos(self, px, py):
@@ -127,27 +142,28 @@ class OPTION:
         if self.Angle < 12  and AddAngle == 1:
             self.Angle +=1
 
+        print(self.Angle)
+
     #オプション表示
     def draw(self):
-        #pyxel.blt(self.lox, self.loy, 0, 32,0, 16,16, 15)
-        #pyxel.blt(self.rox, self.roy, 0, 32,0, 16,16, 15)
-
         self.Spl.spdraw(self.lox, self.loy)
+        self.Spr.spdraw(self.rox, self.roy)
 
         #オプション光点L
         x1=self.lox
-        y1=self.py + OPTION.OFSY + 8
-
-        #x2=CosTbl[OPTION.LOptAngleTbl[self.Angle]]*5
-        #y2=SinTbl[OPTION.LOptAngleTbl[self.Angle]]*5
-        #pyxel.circ(x2,y2,1,8)
-        pyxel.line(self.lox, self.loy, 0,0,8)
+        y1=self.loy
+        x2=x1 + CosTbl[OPTION.LOptAngleTbl[self.Angle]]*5
+        y2=y1 + SinTbl[OPTION.LOptAngleTbl[self.Angle]]*5
+        pyxel.line(x1, y1, x2, y2,8)
+        pyxel.circ(x2,y2,1,8)
 
         #オプション光点R
-        # x1=self.px + OPTION.OFSX + 8
-        # x2=x1 + CosTbl[OPTION.ROptAngleTbl[self.Angle]]*5
-        # pyxel.circ(x2,y2,1,8)
-        #pyxel.line(x1,y1,x2,y2,8)
+        x1=self.rox
+        y1=self.roy
+        x2=x1 + CosTbl[OPTION.ROptAngleTbl[self.Angle]]*5
+        y2=y1 + SinTbl[OPTION.ROptAngleTbl[self.Angle]]*5
+        pyxel.line(x1, y1, x2, y2,8)
+        pyxel.circ(x2,y2,1,8)
 
 class clsGamePlay:
     def __init__(self):
@@ -172,6 +188,7 @@ class clsGamePlay:
             SinTbl.append(math.sin(r))
             CosTbl.append(math.cos(r))
     
+
         #print (CosTbl[270] ,SinTbl[270] )
 
     #更新処理
@@ -199,7 +216,7 @@ class clsGamePlay:
 
         cx=1
         cy=1
-        if vx != 0 and vy != 0: #ナナメ補正
+        if vx != 0 and vy != 0: #ナナメ速度補正
             cx = 0.71
             cy = 0.71
         self.ship.px+=(vx * cx)
