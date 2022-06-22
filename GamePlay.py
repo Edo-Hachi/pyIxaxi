@@ -41,6 +41,7 @@ class BULLET:
 
         self.sp = Sprite.SPRITE()
         self.sp.spset(0, 16,16, 8,8, 16,16,15)
+        self.sp.spcolr(4,4,8,8)
         self.sp.spshow(True)
 
         self.enable = True
@@ -64,6 +65,7 @@ class BULLET:
         if self.enable == True:
             #pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
             self.sp.spdraw(self.bx, self.by)
+            #self.sp.show_collision_r(False)
             
 
 
