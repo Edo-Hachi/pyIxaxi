@@ -34,7 +34,7 @@ def CleanupList(list):
 
 
 class BULLET:
-    def __init__(self, sx, sy, deg, spd):
+    def __init__(self, sx, sy, deg, spd, type):
         self.sx = sx    #開始座標
         self.sy = sy
 
@@ -42,6 +42,9 @@ class BULLET:
         self.by = sy
 
         self.spd = spd  #Speed
+        self.type = type #Type
+
+
         #self.rad = math.atan2(ty-sy, tx-sx)
         self.deg= deg #math.degrees(self.rad)
         self.vx = CosTbl[self.deg]
@@ -72,8 +75,12 @@ class BULLET:
     def draw(self):
         if self.enable == True:
             #pyxel.blt(self.bx, self.by, 0, 0,16, 16,16, 15)
+            if type == 0:
+                self.sp.spset(0, 16,16, 8,8, 0,16, 16)
+            elif type == 1:
+                self.sp.spset(0, 16,16, 8,8, 0,32, 16)
+
             self.sp.spdraw(self.bx, self.by)
-            #self.sp.show_collision_r(False)
 
 #座標管理
 class SHIPPOS:
@@ -231,12 +238,12 @@ class clsGamePlay:
             if self.ship.roll < 10:
                 self.ship.roll+=2
 
-        cx=1; cy=1
-        
         #Adjustment of travel amount when moving diagonally
+        cx=1; cy=1
         if vx != 0 and vy != 0: #ナナメ速度補正
             cx = 0.71
             cy = 0.71
+        
         self.ship.px+=(vx * cx)
         self.ship.py+=(vy * cy)
 
@@ -269,10 +276,10 @@ class clsGamePlay:
         #Shot Bullet
         if pyxel.btn(pyxel.KEY_Z):
             if self.BltTimer <= 0:
-                BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4))
+                BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4, 0))
 
-                BulletList.append(BULLET(self.Option.rox, self.Option.roy, OPTION.ROptAngleTbl[self.Option.Angle],3))
-                BulletList.append(BULLET(self.Option.lox, self.Option.loy, OPTION.LOptAngleTbl[self.Option.Angle],3))
+                BulletList.append(BULLET(self.Option.rox, self.Option.roy, OPTION.ROptAngleTbl[self.Option.Angle],3, 1))
+                BulletList.append(BULLET(self.Option.lox, self.Option.loy, OPTION.LOptAngleTbl[self.Option.Angle],3, 1))
 
                 self.BltTimer = 5   #Bullet Fire Timing per 5 frames
             else:
@@ -284,8 +291,10 @@ class clsGamePlay:
         #create new enemy object
         if pyxel.btn(pyxel.KEY_E):
             enemy = Enemy.Enemy01()
-            enemy.SetPos(100, -16)
-            enemy.SpDef(0,32, 16,16, 8,8)
+            #enemy.SetPos(100,100)
+            enemy.SetPos(100, 16)
+
+            enemy.SpDef(0, 16,16, 8,8, 0,32)
             enemy.SetShow(True)
             EnemyList.append(enemy)
 

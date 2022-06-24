@@ -10,17 +10,25 @@ class ENEMY:
 
         self._x = -100      #スプライト表示座標
         self._y = -100
+        
         self._w = 16    #スプライトサイズ
         self._h = 16
-        self.enable = True
+        
+        self._u = 0    #スプライト参照座標
+        self._v = 0
+
+        self._p = 0    #スプライト参照ページ
+
         self._vx = 0
         self._vy = 0
-        self._show = False
 
-        self.move = 0
+        self._show = True
+        self.enable = True
+
+        self._moveLR = 0
 
         self.sp = SPRITE()
-        self.sp.spset(0,16,16, 8,8, 0,32, 15)
+        self.sp.spset(0, 16,16, 8,8, 0,32, 15)
     
     def SetPos(self, x, y):
         self._x = x
@@ -30,11 +38,17 @@ class ENEMY:
         self._show = show
         self.sp.spshow(show)
     
-    def SpDef(self, u,v, w,h):
+    def SpDef(self, page, w,h, ox, oy, u, v):
+
+        self._p = page #参照ページ　
+
         self._w = w    #スプライトサイズ
         self._h = h
+        
+        self._u = u #参照座標
+        self._v = v
 
-        self.sp.spset(0, 16,16, 8,8, 0,32, 15)# .spset(0, w,h, 8,8, u,v, 15)
+        self.sp.spset(page, w,h ,ox,oy, u,v, 15)
     
     def Update(self):
         pass
@@ -46,21 +60,21 @@ class Enemy01(ENEMY):
 
     def update(self):
 
-        self._x = 100
-        self._y = 100
+        #self._x = 100
+        #self._y = 100
         print("Enemy UpDate Call")
-        return
 
-        if self.move ==0:
-            self._x += 1
+        if self._moveLR == 0:
+            self._x += 8
             if Common.WIDTH < self._x:
-                self.move = 1
-        elif self.move == 1:
-            self._x -= 1
+                self._moveLR = 1
+                self._y += 8
+        elif self._moveLR == 1:
+            self._x -= 8
             if 0 > self._x:
-                self.move = 0
+                self._moveLR = 0
+                self._y += 8
         
-        self._y += 5
 
         if Common.HEIGHT< self._y:
             self.enable = False
