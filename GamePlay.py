@@ -48,7 +48,7 @@ class BULLET:
         self.vy = SinTbl[self.deg]
 
         self.sp = Sprite.SPRITE()
-        self.sp.spset(0, 16,16, 8,8, 16,16,15)
+        self.sp.spset(0, 16,16, 8,8, 16,16, 15)
         self.sp.spcolr(4,4,8,8)
         self.sp.spshow(True)
 
@@ -89,12 +89,21 @@ class SHIP:
         self.vx=0
         self.vy=0
 
+        self.roll = 0   #左右移動時のロール制御
+
         self.SpPl = Sprite.SPRITE()
         self.SpPl.spset(0, 16,16, 8, 8, 0,0, 15)
         self.SpPl.spshow(True)
 
     def draw(self):
         #pyxel.blt(self.px, self.py, 0, 0,0, 16,16, 15)
+        if self.roll < 0:
+            self.SpPl.spset(0, 16, 16, 8,8, 16,0, 15)
+        elif self.roll > 0:
+            self.SpPl.spset(0, -16, 16, 8,8, 16,0, 15)
+        else:
+            self.SpPl.spset(0, 16,16, 8, 8, 0,0, 15)
+             
         self.SpPl.spdraw(self.px, self.py)
 
 #オプション管理
@@ -199,23 +208,32 @@ class clsGamePlay:
     def update(self):
         
         #キー入力(移動)
-        vx=0
-        vy=0
+        vx=0;vy=0
+        #Key input for movement
+        #move up
         if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             vy=-1
             if self.FpsCount % 3 == 0: #3フレーム毎にオプションの角度を変更する
                 self.Option.SetAngle(1)
+        #move down
         if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             vy=1
             if self.FpsCount % 3 == 0: #3フレーム毎にオプションの角度を変更する
                 self.Option.SetAngle(-1)
+        #move left 
         if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             vx=-1
+            if self.ship.roll > -10:
+                self.ship.roll-=2
+        #move right
         if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
             vx=1
+            if self.ship.roll < 10:
+                self.ship.roll+=2
 
-        cx=1
-        cy=1
+        cx=1; cy=1
+        
+        #Adjustment of travel amount when moving diagonally
         if vx != 0 and vy != 0: #ナナメ速度補正
             cx = 0.71
             cy = 0.71
@@ -223,6 +241,7 @@ class clsGamePlay:
         self.ship.py+=(vy * cy)
 
         #自機の過去座標をロータリーバッファに保存
+        #Save myship's movement path to rotary buffer　　
         self.PosList[self.PosIndx].x = self.ship.px
         self.PosList[self.PosIndx].y = self.ship.py
         self.PosIndx+=1
@@ -230,20 +249,24 @@ class clsGamePlay:
             self.PosIndx = 1
 
         #オプションのロータリーバッファ参照座標
+        #Index of rotary buffer referenced by option
         self.OptPosIndx+=1
         if ShipPosRecMax-1 < self.OptPosIndx:
             self.OptPosIndx = 1
 
         #オプションの角度ロックを行うか？
+        #Will the option maintain its current angle?
+
         if pyxel.btn(pyxel.KEY_LSHIFT):
             self.Option.AngleLock(True)
         else:
             self.Option.AngleLock(False)
 
         #オプションに現在座標設定
+        #Options follow the trajectory of my ship.
         self.Option.SetPos(self.PosList[self.OptPosIndx].x, self.PosList[self.OptPosIndx].y)
 
-        #弾発射
+        #Shot Bullet
         if pyxel.btn(pyxel.KEY_Z):
             if self.BltTimer <= 0:
                 BulletList.append(BULLET(self.ship.px, self.ship.py, 270, 4))
@@ -251,9 +274,9 @@ class clsGamePlay:
                 BulletList.append(BULLET(self.Option.rox, self.Option.roy, OPTION.ROptAngleTbl[self.Option.Angle],3))
                 BulletList.append(BULLET(self.Option.lox, self.Option.loy, OPTION.LOptAngleTbl[self.Option.Angle],3))
 
-                self.BltTimer = 5   #Bullet Fire Timing
+                self.BltTimer = 5   #Bullet Fire Timing per 5 frames
             else:
-                self.BltTimer -= 1
+                self.BltTimer -= 1  #decrease Bullet Fire Timing
 
         for i in range(0, len(BulletList)):
             BulletList[i].update()
@@ -262,16 +285,22 @@ class clsGamePlay:
         if pyxel.btn(pyxel.KEY_E):
             enemy = Enemy.Enemy01()
             enemy.SetPos(100, -16)
-            enemy.SpDef(0,32, 16,16)
+            enemy.SpDef(0,32, 16,16, 8,8)
             enemy.SetShow(True)
             EnemyList.append(enemy)
-
 
         for i in range(0, len(EnemyList)):
             EnemyList[i].update()
         
+        #ship roll angle adjustment
+        if self.ship.roll > 0:
+            self.ship.roll -= 1
+        elif self.ship.roll < 0:
+            self.ship.roll += 1
+        
+        #print(self.ship.roll)
 
-        #自弾のガベコレ
+        #gabage collect  for bullet list
         CleanupList(BulletList)
 
     #Draw----------------------------------------------------------------------
@@ -286,12 +315,13 @@ class clsGamePlay:
         if 0 < self.OptPosIndx: #オプションの表示座標は-15フレームから始めているので
             self.Option.draw()
 
-        #自機描画
+        #Draw my ship
         self.ship.draw()
 
-        #自弾描画       
+        #Draw My Ship bullet   
         for i in range(0, len(BulletList)):
             BulletList[i].draw()
 
+        #Draw Enemy List
         for i in range(0, len(EnemyList)):
             EnemyList[i].draw()

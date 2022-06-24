@@ -27,7 +27,7 @@ class SPRITE:
         self._col_b = 0
 
 
-        self._show = False
+        self._show = True
 
         self._imgpage = 0 #スプライト参照ページ
 
