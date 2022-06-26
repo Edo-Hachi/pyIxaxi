@@ -1,6 +1,7 @@
 # Phthon3 Program
 
 from math import radians
+from random import randint, random
 from numpy import size
 import pyxel
 import Common
@@ -291,11 +292,15 @@ class clsGamePlay:
         #create new enemy object
         if pyxel.btn(pyxel.KEY_E):
             enemy = Enemy.Enemy01()
-            #enemy.SetPos(100,100)
-            enemy.SetPos(100, 16)
+
+            #enemy.SetPos(randint(0,Common.WIDTH), 32)
+            enemy.SetPos(200, 0)
 
             enemy.SpDef(0, 16,16, 8,8, 0,32)
             enemy.SetShow(True)
+            enemy.SetState(Enemy.Enemy01.STAT_DOWN)
+            enemy.SetRange(50, Common.WIDTH-50)
+
             EnemyList.append(enemy)
 
         for i in range(0, len(EnemyList)):
