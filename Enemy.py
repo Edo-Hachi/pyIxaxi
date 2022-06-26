@@ -82,26 +82,30 @@ class Enemy01(ENEMY):
         match self.eState:
             case Enemy01.STAT_DOWN:
                 #print("Enemy Update Down Call")
-                self._y += 2
-                if self._y % 32 == 0:
-                    if self._x < Common.WIDTH/2:
-                        self.eState = Enemy01.STAT_R
-                    elif self._x > Common.WIDTH/2:
-                        self.eState = Enemy01.STAT_L
+                # self._y += 2
+                # if self._y % 32 == 0:
+                #     if self._x < Common.WIDTH/2:
+                #         self.eState = Enemy01.STAT_R
+                #     elif self._x > Common.WIDTH/2:
+                #         self.eState = Enemy01.STAT_L
                 pass
             case Enemy01.STAT_R:
                 #print("Enemy Update Right Call")
-                self._x += 2
+                self._x += 4
                 if self._x > self.XrangeMax:
-                   self.eState = Enemy01.STAT_DOWN
+                   #self.eState = Enemy01.STAT_DOWN
+                   self.eState = Enemy01.STAT_L
                 #pass
             case Enemy01.STAT_L:
                 #print("Enemy Update Left Call")
-                self._x -= 2
+                self._x -= 4
                 if self._x < self.XrangeMin:
-                    self.eState = Enemy01.STAT_DOWN
+                    #self.eState = Enemy01.STAT_DOWN
+                    self.eState = Enemy01.STAT_R
                 #pass
-                     
+
+        self._y += 0.5
+
         if Common.HEIGHT< self._y:
             self.enable = False
             

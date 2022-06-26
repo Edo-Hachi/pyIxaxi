@@ -29,7 +29,7 @@ def CleanupList(list):
         elem = list[i]
         if elem.enable == False:
             list.pop(i)
-            #print("Delete bullet")
+            print("Cleanup List")
         else:
             i += 1
 
@@ -194,6 +194,9 @@ class clsGamePlay:
 
         self.Option = OPTION(0, 0)  #オプション管理クラス
 
+
+        self.EnemyDebugTimer = 0    #敵デバッグ用タイマー
+
         #自機の移動軌跡を保存
         self.PosList = []
         for i in range(0,ShipPosRecMax+1):
@@ -289,19 +292,25 @@ class clsGamePlay:
         for i in range(0, len(BulletList)):
             BulletList[i].update()
 
-        #create new enemy object
         if pyxel.btn(pyxel.KEY_E):
-            enemy = Enemy.Enemy01()
+            #create new enemy object
+            if self.EnemyDebugTimer < 0:
+                enemy = Enemy.Enemy01()
 
-            #enemy.SetPos(randint(0,Common.WIDTH), 32)
-            enemy.SetPos(200, 0)
+                #enemy.SetPos(randint(0,Common.WIDTH), 32)
+                enemy.SetPos(200, 0)
 
-            enemy.SpDef(0, 16,16, 8,8, 0,32)
-            enemy.SetShow(True)
-            enemy.SetState(Enemy.Enemy01.STAT_DOWN)
-            enemy.SetRange(50, Common.WIDTH-50)
+                enemy.SpDef(0, 16,16, 8,8, 0,32)
+                enemy.SetShow(True)
+                enemy.SetState(Enemy.Enemy01.STAT_R)
+                enemy.SetRange(50, Common.WIDTH-50)
 
-            EnemyList.append(enemy)
+                EnemyList.append(enemy)
+                self.EnemyDebugTimer = 10
+
+            else:
+                self.EnemyDebugTimer -= 1
+
 
         for i in range(0, len(EnemyList)):
             EnemyList[i].update()
@@ -316,6 +325,7 @@ class clsGamePlay:
 
         #gabage collect  for bullet list
         CleanupList(BulletList)
+        CleanupList(EnemyList)
 
     #Draw----------------------------------------------------------------------
     def draw(self):
