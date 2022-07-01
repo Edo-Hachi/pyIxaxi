@@ -11,6 +11,7 @@ import math
 
 ShipPosRecMax = 100 #自機の移動履歴レコード上限
 
+
 #SinCosテーブル
 SinTbl = []
 CosTbl = []
@@ -21,6 +22,7 @@ BulletList = []
 #EnemyList Class
 EnemyList = []
     
+#GameCount :int=0 #ゲーム開始からのインターバルカウンタ
 
 #消去フラグの立ったリスト要素を削除する
 def CleanupList(list):
@@ -194,6 +196,7 @@ class clsGamePlay:
 
         self.Option = OPTION(0, 0)  #オプション管理クラス
 
+        self.GameCount = 0 #ゲーム開始からのインターバルカウンタ
 
         self.EnemyDebugTimer = 0    #敵デバッグ用タイマー
 
@@ -211,13 +214,13 @@ class clsGamePlay:
             SinTbl.append(math.sin(r))
             CosTbl.append(math.cos(r))
     
-
         #print (CosTbl[270] ,SinTbl[270] )
 
     #--------------------------------------------------------------------------
     #更新処理
     def update(self):
         
+
         #キー入力(移動)
         vx=0;vy=0
         #Key input for movement
@@ -294,7 +297,8 @@ class clsGamePlay:
 
         if pyxel.btn(pyxel.KEY_E):
             #create new enemy object
-            if self.EnemyDebugTimer < 0:
+            #if self.EnemyDebugTimer < 0:
+            if self.GameCount % 10 == 0:
                 enemy = Enemy.Enemy01()
 
                 #enemy.SetPos(randint(0,Common.WIDTH), 32)
@@ -306,10 +310,10 @@ class clsGamePlay:
                 enemy.SetRange(50, Common.WIDTH-50)
 
                 EnemyList.append(enemy)
-                self.EnemyDebugTimer = 10
+            #    self.EnemyDebugTimer = 10
 
-            else:
-                self.EnemyDebugTimer -= 1
+            #else:
+            #    self.EnemyDebugTimer -= 1
 
 
         for i in range(0, len(EnemyList)):
@@ -326,6 +330,9 @@ class clsGamePlay:
         #gabage collect  for bullet list
         CleanupList(BulletList)
         CleanupList(EnemyList)
+
+        self.GameCount += 1  #ゲームカウント
+
 
     #Draw----------------------------------------------------------------------
     def draw(self):
