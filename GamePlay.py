@@ -217,6 +217,17 @@ class clsGamePlay:
         #print (CosTbl[270] ,SinTbl[270] )
 
     #--------------------------------------------------------------------------
+    #Game Start Init Func
+    def GameInit(self):
+        self.GameCount = 0
+        self.PosIndx=0  #自機のロータリーバッファポインタ
+        self.OptPosIndx = -15  #オプションの座標は15インデックス遅れでついてくる
+        #reset self.PosList
+        for i in range(0,ShipPosRecMax+1):
+            self.PosList[i].x = -1
+            self.PosList[i].y = -1
+
+    #--------------------------------------------------------------------------
     #更新処理
     def update(self):
         

@@ -30,6 +30,10 @@ class App:
             case Common.GS_TITLE:
                 TitleObj.update()
                 pass
+            case Common.GS_PLAY_INIT:
+                GamePlayObj.GameInit()
+                Common.GState = Common.GS_PLAY
+
             case Common.GS_GAMEOVER:
                 pass
             case Common.GS_DEMO:
